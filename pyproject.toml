@@ -1,0 +1,64 @@
+[tool.poetry]
+name = "mlb-the-show-analysis"
+version = "0.1.0"
+description = "A data project to analyze the performance of my friends and I in the video game MLB: The Show."
+authors = ["Chris Peterson <cdpeters1@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+playwright = "^1.30.0"
+beautifulsoup4 = "^4.11.2"
+
+[tool.poetry.group.dev.dependencies]
+black = "^23.1.0"
+isort = "^5.12.0"
+flake8 = "^6.0.0"
+interrogate = "^1.5.0"
+flake8-docstrings = "^1.7.0"
+mypy = "^1.0.1"
+nbqa = "^1.6.3"
+blacken-docs = "^1.13.0"
+ipykernel = "^6.21.2"
+jupyterlab = "^3.6.1"
+pre-commit = "^3.0.4"
+sphinx = "^6.1.3"
+docrepr = "^0.2.0"
+
+[tool.black]
+target-version = ["py311"]
+
+[tool.isort]
+profile = "black"
+
+[tool.interrogate]
+ignore-init-module = true
+fail-under = 100
+verbose = 1
+exclude = ["*.ipynb_checkpoints*"]
+
+[tool.mypy]
+python_version = "3.11"
+
+[[tool.mypy.overrides]]
+module = [
+    "dash.*",
+    "plotly.*",
+    "ibis.*"
+]
+ignore_missing_imports = true
+
+[tool.nbqa.addopts]
+flake8 = [
+    "--extend-ignore=D100"
+]
+interrogate = [
+    "--ignore-module"
+]
+
+[tool.nbqa.md]
+blacken-docs = true
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
