@@ -1,0 +1,5 @@
+name: mlbTheShow
+channels:
+  - defaults
+dependencies:
+  - python=3.11
