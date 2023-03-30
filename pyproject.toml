@@ -16,6 +16,7 @@ pendulum = "^2.1.2"
 lxml = "^4.9.2"
 selectolax = "^0.3.12"
 spacy = "^3.5.0"
+html5lib = "^1.1"
 
 [tool.poetry.group.dev.dependencies]
 black = "^23.1.0"
@@ -43,6 +44,8 @@ known_first_party = ["classes", "utils"]
 
 [tool.interrogate]
 ignore-init-module = true
+ignore-magic = true
+ignore-property-decorators = true
 fail-under = 100
 verbose = 1
 exclude = ["*.ipynb_checkpoints*"]
@@ -66,7 +69,12 @@ flake8 = [
     "--extend-ignore=D100"
 ]
 interrogate = [
-    "--ignore-module"
+    "--ignore-module",
+    "--ignore-magic",
+    "--ignore-property-decorators",
+    "--fail-under=100",
+    "--verbose",
+    '--exclude=["*.ipynb_checkpoints*"]'
 ]
 
 [tool.nbqa.md]

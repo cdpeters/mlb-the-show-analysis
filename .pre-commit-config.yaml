@@ -31,9 +31,12 @@ repos:
   hooks:
   - id: interrogate
     args: [
-      --verbose,
       --ignore-init-module,
-      --fail-under=100
+      --ignore-magic,
+      --ignore-property-decorators,
+      --fail-under=100,
+      --verbose,
+      '--exclude=["*.ipynb_checkpoints*"]'
     ]
     types: [python]
 # Linter
@@ -86,10 +89,12 @@ repos:
   - id: nbqa
     name: nbqa-interrogate
     args: [
-      --verbose,
-      --ignore-init-module,
+      --ignore-module,
+      --ignore-magic,
+      --ignore-property-decorators,
       --fail-under=100,
-      --ignore-module
+      --verbose,
+      '--exclude=["*.ipynb_checkpoints*"]'
     ]
     description: Run 'interrogate' on a Jupyter Notebook
     entry: nbqa interrogate
