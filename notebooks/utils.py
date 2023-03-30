@@ -5,11 +5,10 @@ import logging
 import time
 from typing import Callable
 
-from selectolax.parser import HTMLParser, Node
 from splinter.driver.webdriver.chrome import WebDriver
 
 # Delay to allow for pages and tables to load.
-TIME_DELAY = 4
+TIME_DELAY = 2
 # Reload limit when browser does not display any games and needs to be reloaded.
 RELOAD_LIMIT = 2
 
@@ -32,37 +31,49 @@ def delay(func):
     return wrapper_delay
 
 
-# @delay
-def browser_action(browser_method: Callable, *args, **kwargs):
-    """Pass through function that applies a browser action."""
-    return browser_method(*args, **kwargs)
+def reload(func):
+    """Time delay decorator applied during browser actions involving loading."""
 
-
-def retrieve_game_nodes(
-    parser: HTMLParser, css_selector: str, browser: WebDriver
-) -> tuple[list[Node], HTMLParser]:
-    """Parse html with additional logic for reloading the browser if needed."""
-    for counter in range(RELOAD_LIMIT + 1):
-        game_nodes = parser.css(css_selector)
-        logger_utils.debug(f"Return type: {type(game_nodes)}")
-        logger_utils.debug(f"Length of return value: {len(game_nodes)}")
-
-        if game_nodes:
-            return game_nodes, parser
-        else:
-            if counter == RELOAD_LIMIT:
+    @functools.wraps(func)
+    def wrapper_reload(*args, **kwargs):
+        """Reload browser if stop reload condition not met."""
+        browser = kwargs["browser"]
+        for counter in range(RELOAD_LIMIT + 1):
+            is_stop_reload_condition, condition_msg = func(*args, **kwargs)
+            time.sleep(TIME_DELAY)
+            if is_stop_reload_condition:
+                logger_utils.info("Element found, completing browser action.")
+                return is_stop_reload_condition, condition_msg
+            else:
+                if counter == RELOAD_LIMIT:
+                    logger_utils.info(
+                        f"The maximum number of reload attempts ({RELOAD_LIMIT}) "
+                        f"has been reached. The stop reload condition: "
+                        f"{condition_msg}, was not met."
+                    )
+                    return is_stop_reload_condition, condition_msg
                 logger_utils.info(
-                    f"The maxiumum number of reload attempts ({RELOAD_LIMIT}) "
-                    f"has been reached. The game history is empty."
+                    f"The loaded page did not meet the stop reload condition: "
+                    f"{condition_msg}. Reloading the page. This is reload attempt "
+                    f"{counter + 1}."
                 )
-                return game_nodes, parser
-            logger_utils.info(
-                f"Game history did not load. Reloading the page. This is "
-                f"reload attempt {counter + 1}."
-            )
+                browser.reload()
 
-            browser_action(browser.reload)
+    return wrapper_reload
 
-            post_reload_html = browser.html
-            # Recreate the parser object with the new html.
-            parser = HTMLParser(post_reload_html)
+
+@reload
+def browser_action_with_element_presence_check(
+    browser_method: Callable,
+    *method_args,
+    css_selector: str,
+    browser: WebDriver,
+    **method_kwargs,
+) -> tuple[bool, str]:
+    """Perform browser action and check presence of element by css selector."""
+    browser_method(*method_args, **method_kwargs)
+    is_element_present = browser.is_element_present_by_css(css_selector)
+    stop_reload_condition_msg = (
+        f"Presence of an element with the css selector '{css_selector}'"
+    )
+    return is_element_present, stop_reload_condition_msg
