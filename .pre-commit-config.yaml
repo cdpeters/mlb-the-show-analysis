@@ -45,7 +45,7 @@ repos:
   hooks:
   - id: flake8
     args: [
-      "--extend-ignore=E203,D104",
+      "--extend-ignore=D102,D104,D105,E203,E501",
       --max-line-length=88,
       --docstring-convention=numpy
     ]
@@ -105,7 +105,7 @@ repos:
   - id: nbqa-flake8
     name: nbqa-flake8
     args: [
-      "--extend-ignore=E203,D104,D100",
+      "--extend-ignore=D100,D102,D104,D105,E203,E501",
       --max-line-length=88,
       --docstring-convention=numpy
     ]

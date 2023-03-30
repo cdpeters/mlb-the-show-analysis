@@ -66,7 +66,7 @@ ignore_missing_imports = true
 
 [tool.nbqa.addopts]
 flake8 = [
-    "--extend-ignore=D100"
+    "--extend-ignore=D100,D102,D104,D105,E203,E501"
 ]
 interrogate = [
     "--ignore-module",
